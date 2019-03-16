@@ -1,0 +1,12 @@
+
+# Finding Closures: Dataset Overview
+
+* The **restaurant inspections** does not contain any closed restaurants by definition
+
+* The **Inspections** and **Legally Operating Businesses** data sets are updated on the same day
+
+    - A business must have a valid license
+
+    - We know a business exists if it passes an inspection
+
+    -
