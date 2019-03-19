@@ -11,6 +11,7 @@
 # impute their values
 
 import os
+
 import numpy as np
 import pandas as pd
 
@@ -20,7 +21,9 @@ import pandas as pd
 
 
 DATA_DIR = "data/"
+IRS_DATA_DIR = DATA_DIR + "irs/datasets/"
 NYC_OPEN_DATA_DIR = DATA_DIR + "nyc_open_data/datasets/"
+YAHOO_FINANCE = DATA_DIR + "yahoo_finance/"
 
 
 #
@@ -197,6 +200,104 @@ def fetch_restaurant_violation_lookup_table(refresh=False):
 
 def fetch_legally_operating_businesses():
     df = pd.read_csv(NYC_OPEN_DATA_DIR + 'Legally_Operating_Businesses.csv')
+
+    # Initial clean
+    df = _strip_strings(df)
+    df = _camel_case_cols(df)
+    df = _remove_punctuation(df)
+
+    return df
+
+
+def fetch_alternative_agi_returns(as_percents=True):
+    df = pd.read_csv(IRS_DATA_DIR + "AGI-Returns.csv")
+
+    # Initial clean
+    df = _strip_strings(df)
+    df = _camel_case_cols(df)
+    df = _remove_punctuation(df)
+
+    # Filter out non-NYC zip codes for faster processing
+    df = df.loc[df['zip'] < 11500]
+
+    # Pivot table
+    df = df.join(pd.get_dummies(df['size_of_adjusted_gross_income'], prefix='agi'))
+
+    agi_cols = [c for c in df.columns.tolist() if "agi_" in c]
+
+    for c in agi_cols:
+        df[c] = np.where(df[c] == 1, df['number_of_returns'], 0)
+
+    # Drop cols pre-pivot
+    df = df.drop(['size_of_adjusted_gross_income', 'number_of_returns'], 1)
+
+    # Make this table numeric
+    for c in df.columns:
+        df[c] = pd.to_numeric(df[c], downcast='float')
+
+    # Make each row a zip
+    df = df.groupby('zip', as_index=False).sum()
+    df = _camel_case_cols(df)
+
+    # Make each column into a percent representation of
+    # the whole.
+    # Appends "total tax returns" column
+    if as_percents:
+        agi_cols = [c for c in df.columns.tolist() if "agi_" in c]
+        df['total_tax_returns'] = df[agi_cols].sum(axis=1)
+        df[agi_cols] = df[agi_cols].div(df['total_tax_returns'], axis=0)
+
+    return df
+
+
+def fetch_alternative_demographic_stats_data():
+    df = pd.read_csv(NYC_OPEN_DATA_DIR + "Demographic_Statistics_By_Zip_Code.csv")
+
+    # Initial clean
+    df = _strip_strings(df)
+    df = _camel_case_cols(df)
+    df = _remove_punctuation(df)
+
+    df = df.rename(columns={'jurisdiction_name': 'zip'})
+
+    # Filter out non-NYC zip codes for faster processing
+    df = df.loc[df['zip'] < 11500]
+
+    # Drop the unneeded, more specific count columns
+    drop_cols = [c for c in df.columns if "count" in c and c != 'count_participants']
+
+    # Plus sparse ones
+    drop_cols += ['percent_gender_unknown']
+
+    df = df.drop(drop_cols, 1)
+
+    return df
+
+
+def fetch_alternative_financial_data():
+    dji = pd.read_csv(YAHOO_FINANCE + "^DJI.csv")
+    vix = pd.read_csv(YAHOO_FINANCE + "^VIX.csv")
+
+    dji = dji[['Date', 'Adj Close']]
+    vix = vix[['Date', 'Adj Close']]
+
+    dji = dji.rename(columns={'Adj Close': 'dji_close'})
+    vix = vix.rename(columns={'Adj Close': 'vix_close'})
+
+    df = dji.merge(vix)
+
+    df['year'] = df['Date'].apply(lambda x: x.split('-')[0])
+    df['month'] = df['Date'].apply(lambda x: x.split('-')[1])
+
+    df = df.drop('Date', 1)
+
+    df = df.groupby(['year', 'month'], as_index=False).mean()
+    df = df.sort_values(by=['year', 'month'])
+
+    df['dji_sma_5'] = df['dji_close'].rolling(window=5).mean()
+    df['vix_sma_5'] = df['vix_close'].rolling(window=5).mean()
+
+    df = df.fillna(0)
 
     # Initial clean
     df = _strip_strings(df)
