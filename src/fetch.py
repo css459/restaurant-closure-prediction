@@ -88,20 +88,28 @@ def fetch_inspection_data(append_closure_col=True):
         # A *closure* is determined by the following inspection results
         closures = ['out of business', 'unable to locate', 'fail']
         df['is_closed'] = np.where(df['inspection_result'].isin(closures), 1, 0)
+        df['reason'] = np.where(df['inspection_result'].isin(closures), df['inspection_result'], 'na')
 
         # Sort since we will then drop duplicates
         df = df.sort_values(by='is_closed', ascending=False)
 
     df = df.drop_duplicates('record_id', keep='first')
-    df = df.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=True)
 
-    return df
+    # df = df.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=True)
+
+    if append_closure_col:
+        return df.sort_values(by=['inspection_year', 'inspection_month',
+                                  'inspection_day', 'is_closed'], ascending=False)
+    else:
+        return df.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=False)
 
 
-def fetch_restaurant_inspection_data():
+def fetch_restaurant_inspection_data(include_violation_code=False):
     """
     This Dataset can be used for finding SOFT CLOSURES: Those which are caused
     by inspections.
+    :param include_violation_code:  If True, table will be grouped by violations
+                                    instead of by restaurant
     :return:
     """
     df = pd.read_csv(NYC_OPEN_DATA_DIR + 'DOHMH_New_York_City_Restaurant_Inspection_Results.csv')
@@ -151,16 +159,27 @@ def fetch_restaurant_inspection_data():
     df['critical_flag'] = pd.to_numeric(df['critical_flag'])
 
     # Drop unneeded cols
-    drop_cols = ['action', 'violation_code', 'violation_description', 'inspection_date',
+    drop_cols = ['action', 'violation_description', 'inspection_date',
                  'grade_date', 'record_date', 'inspection_type']
+
+    if not include_violation_code:
+        drop_cols.append('violation_code')
+
     df = df.drop(drop_cols, 1)
+
+    # Rename columns for consistency
+    df = df.rename(columns={'zipcode': 'zip'})
 
     # Sort by date
     df = df.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=False)
 
     # Group by identifiers
     df['total_inspections'] = 1
-    ids = ['camis', 'dba', 'boro', 'building', 'street', 'zipcode', 'phone', 'cuisine_description']
+    ids = ['camis', 'dba', 'boro', 'building', 'street', 'zip', 'phone', 'cuisine_description']
+
+    if include_violation_code:
+        ids.append('violation_code')
+
     g = df.groupby(ids, as_index=False)
 
     # The aggregation will occur as follows:
@@ -185,7 +204,7 @@ def fetch_restaurant_inspection_data():
     # Make violation ratio
     g['violation_ratio'] = g['violation_count'] / g['total_inspections']
 
-    return g
+    return g.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=False)
 
 
 def fetch_restaurant_violation_lookup_table(refresh=False):

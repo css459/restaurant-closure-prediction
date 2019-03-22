@@ -59,3 +59,7 @@ or could not be located. These I am referring to as a hard, voluntary closure wh
 the original definition. The issue is that I cannot map these results to any other tables with more
 predictive power.
 
+## Ideas
+
+- Are there words in a restaurant's title that correlate to closures?
+
