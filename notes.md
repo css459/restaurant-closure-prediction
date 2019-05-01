@@ -49,7 +49,7 @@ meaningful insights. The dataset is extremely imbalanced, and resulted in a near
 ## Remarks
 
 - **Soft Closures**: Refer to closures which occur from being condemned by the health department. These
-restaurants may re-open at some point in the future and represent a differnt kind of closure than the
+restaurants may re-open at some point in the future and represent a different kind of closure than the
 kind originally proposed. This information is still useful however, and it may provide insights into
 the exact reasons for closures.
 
@@ -63,3 +63,37 @@ predictive power.
 
 - Are there words in a restaurant's title that correlate to closures?
 
+# Project Update April 21st
+
+## Completed Tasks
+
+I have been looking more closely at the Restaurant Inspection Data after combining all data sources into
+a single master dataset.
+
+Mainly, I've looked at a 3-component PCA clustering to see if restaurant clusters form. Currently, there
+are multiple striations which I can only assume represent a similarity of low grade, high violation
+restaurants, up to high grade, low violation restaurants.
+
+
+Words within the name does not appear to correlate with closures
+
+## Remarks
+
+I was using this dataset to reconcile how to deal with highly imbalanced data for soft closures. For this
+I down-sampled the majority class since the estimator had issues with the class imbalance. This achieved an
+F-score of 0.65. However, when I ran the fitted estimator on the entire set, it did not generalize and the
+F-score fell t0 0.03.
+
+
+I have also tried to use the Yelp dataset, however, it did not contain any information on NYC restaurants.
+In fact, there was only 1 data point for this. Since this project is constrained to only NYC restaurants,
+I'm deciding to not use this data source.
+
+
+## To-Do
+
+* I have waited long enough now that I can see a one-month lag in restaurant closures. So I will download the
+updated version of the NYC Open Data Restaurant Inspection dataset, and join them together. If a restaurant
+occurs in both, it is open, otherwise, it has closed. This should net me some more data points.
+
+* I 

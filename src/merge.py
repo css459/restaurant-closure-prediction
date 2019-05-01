@@ -174,13 +174,29 @@ def economic_data():
     return fetch.fetch_alternative_financial_data()
 
 
-# TODO
+# NOT IMPLEMENTED: Insufficent Yelp Data
 # Important keyword frequencies, rating, and count of reviews
 # for each found restaurant (row).
-def reviews_data():
-    pass
+# def reviews_data():
+#     pass
 
 
 # Entirely merged table where possible
-def master():
-    pass
+def master(reload=False):
+    file_name = MERGED_FILE_PATH + "master.csv"
+    if not reload and os.path.isfile(file_name):
+        return pd.read_csv(file_name)
+
+    c = closure_data(reload)
+    e = economic_data()
+    d = demographic_data()
+    m = pd.merge(c,
+                 e,
+                 left_on=['inspection_month', 'inspection_year'],
+                 right_on=['month', 'year'],
+                 how='left')
+
+    m2 = pd.merge(m, d, on='zip', how='inner')
+    m2.to_csv(file_name, index=False)
+
+    return m2
