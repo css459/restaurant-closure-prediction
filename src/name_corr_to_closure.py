@@ -6,7 +6,7 @@
 # with the closure (0/1) as Y.
 #
 # This is done for both hard and soft closures (license and inspection datasets)
-import src.fetch as fetch
+import src.preprocessing.fetch as fetch
 
 restaurant_insp = fetch.fetch_restaurant_inspection_data()
 insp = fetch.fetch_inspection_data(True)

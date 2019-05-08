@@ -13,7 +13,7 @@ import os
 
 import pandas as pd
 
-import src.fetch as fetch
+import src.preprocessing.fetch as fetch
 
 #
 # Constants
@@ -30,7 +30,7 @@ MERGED_FILE_PATH = fetch.DATA_DIR + 'merged/'
 
 def _total_restaurant_closure(restaurant_dataset):
     r = restaurant_dataset[['is_closed', 'inspection_year', 'inspection_month', 'zip']]
-    r = r.loc[r['is_closed']]
+    r = r.loc[r['is_closed'] != 0]
     return r.groupby(['inspection_year', 'inspection_month', 'zip'], as_index=False).count()
 
 
@@ -38,11 +38,13 @@ def _violation_distribution_table(restaurant_dataset):
     r = restaurant_dataset[['is_closed', 'inspection_year',
                             'inspection_month', 'zip', 'violation_code']]
 
+    # r['is_closed'] = r['is_closed'].astype('bool')
+
     # First, generate a list of violations to pivot on
     # This list is generated from using the top 15 violations from closed and not-closed
     # restaurants and taking only the values which do not appear in the non-closed set
-    l1 = r.loc[r['is_closed']]['violation_code'].value_counts(sort=True)[:15]
-    l2 = r.loc[~r['is_closed']]['violation_code'].value_counts(sort=True)[:15]
+    l1 = r.loc[r['is_closed'] != 0]['violation_code'].value_counts(sort=True)[:15]
+    l2 = r.loc[r['is_closed'] == 0]['violation_code'].value_counts(sort=True)[:15]
     violations = ["violation_" + c for c in l1.index if c not in l2.index]
 
     # Pivot Violations
@@ -50,7 +52,7 @@ def _violation_distribution_table(restaurant_dataset):
     dummies = dummies[violations]
     r = r.join(dummies).drop('violation_code', 1)
 
-    r = r.loc[r['is_closed']].drop('is_closed', 1)
+    r = r.loc[r['is_closed'] != 0].drop('is_closed', 1)
 
     return r.groupby(['inspection_year', 'inspection_month', 'zip'], as_index=False).sum()
 
@@ -59,7 +61,7 @@ def _cuisine_distribution_table(restaurant_dataset):
     r = restaurant_dataset[['is_closed', 'inspection_year',
                             'inspection_month', 'zip', 'cuisine_description']]
 
-    r = r.loc[r['is_closed']].drop('is_closed', 1)
+    r = r.loc[r['is_closed'] != 0].drop('is_closed', 1)
 
     r = r.join(pd.get_dummies(r['cuisine_description'],
                               prefix='cuisine')).drop('cuisine_description', 1)
@@ -148,9 +150,9 @@ def closure_data(reload=False):
     full = full.drop('is_closed', 1)
     full = full.sort_values(['inspection_year', 'inspection_month', 'zip'], ascending=False)
 
-    full = fetch._strip_strings(full)
-    full = fetch._camel_case_cols(full)
-    full = fetch._remove_punctuation(full)
+    full = fetch.strip_strings(full)
+    full = fetch.camel_case_cols(full)
+    full = fetch.remove_punctuation(full)
 
     full.to_csv(file_name, index=False)
 
@@ -199,4 +201,4 @@ def master(reload=False):
     m2 = pd.merge(m, d, on='zip', how='inner')
     m2.to_csv(file_name, index=False)
 
-    return m2
+    return m2.drop(['year', 'month'], 1)

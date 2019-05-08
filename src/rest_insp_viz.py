@@ -5,7 +5,7 @@
 import numpy as np
 import pandas as pd
 
-from src.fetch import fetch_restaurant_inspection_data
+from src.preprocessing.fetch import fetch_restaurant_inspection_data
 
 #
 # Prepare Initial Clean

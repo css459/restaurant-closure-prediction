@@ -31,21 +31,21 @@ YAHOO_FINANCE = DATA_DIR + "yahoo_finance/"
 #
 
 
-def _strip_strings(df):
+def strip_strings(df):
     df_obj = df.select_dtypes(['object'])
     df[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
     df[df_obj.columns] = df_obj.apply(lambda x: x.str.lower())
     return df
 
 
-def _camel_case_cols(df):
+def camel_case_cols(df):
     cols = df.columns
     cols = [c.lower().replace(" ", "_") for c in cols]
     df.columns = cols
     return df
 
 
-def _remove_punctuation(df):
+def remove_punctuation(df):
     df_obj = df.select_dtypes(['object'])
     df[df_obj.columns] = df_obj.apply(lambda x: x.str.replace(r'[^\w\s]', ''))
     return df
@@ -66,9 +66,9 @@ def fetch_inspection_data(append_closure_col=True):
     df = pd.read_csv(NYC_OPEN_DATA_DIR + "Inspections.csv")
 
     # Initial clean
-    df = _strip_strings(df)
-    df = _camel_case_cols(df)
-    df = _remove_punctuation(df)
+    df = strip_strings(df)
+    df = camel_case_cols(df)
+    df = remove_punctuation(df)
 
     # Filter by restaurants only
     industries = ['sidewalk cafe  013', 'gaming cafe  129', 'restaurant  818']
@@ -104,20 +104,44 @@ def fetch_inspection_data(append_closure_col=True):
         return df.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=False)
 
 
-def fetch_restaurant_inspection_data(include_violation_code=False):
+def fetch_restaurant_inspection_data(include_violation_code=False, new_set=False, merged_set=True):
     """
     This Dataset can be used for finding SOFT CLOSURES: Those which are caused
     by inspections.
     :param include_violation_code:  If True, table will be grouped by violations
                                     instead of by restaurant
-    :return:
+    :param new_set:                 If True, then a more recent set will be loaded
+                                    for comparison
+    :param merged_set:              If True, the new set and original will be merged
+    :return:                        `DataFrame`
     """
-    df = pd.read_csv(NYC_OPEN_DATA_DIR + 'DOHMH_New_York_City_Restaurant_Inspection_Results.csv')
+
+    if merged_set and new_set:
+        print("[ ERR ] Invalid settings, merged_set and new_set cannot both be True")
+        return None
+
+    # Used for merged_set
+    closed = []
+
+    if new_set:
+        df = pd.read_csv(NYC_OPEN_DATA_DIR + 'DOHMH_New_York_City_Restaurant_Inspection_Results-new.csv')
+    elif merged_set:
+        df_new = pd.read_csv(NYC_OPEN_DATA_DIR + 'DOHMH_New_York_City_Restaurant_Inspection_Results-new.csv')
+        df = pd.read_csv(NYC_OPEN_DATA_DIR + 'DOHMH_New_York_City_Restaurant_Inspection_Results.csv')
+
+        # Find restaurants that have been removed (closed)
+        camis1 = list(df.CAMIS.unique())
+        camis2 = list(df_new.CAMIS.unique())
+        closed = [c for c in camis1 if c not in camis2]
+
+        df = pd.concat([df_new, df])
+    else:
+        df = pd.read_csv(NYC_OPEN_DATA_DIR + 'DOHMH_New_York_City_Restaurant_Inspection_Results.csv')
 
     # Initial clean
-    df = _strip_strings(df)
-    df = _camel_case_cols(df)
-    df = _remove_punctuation(df)
+    df = strip_strings(df)
+    df = camel_case_cols(df)
+    df = remove_punctuation(df)
 
     # Clean grade column
 
@@ -125,7 +149,7 @@ def fetch_restaurant_inspection_data(include_violation_code=False):
     grades = ['c', 'b', 'a']
 
     # Map grades to index values plus 1 (i.e: an "A" is a 3)
-    df['grade'] = df['grade'].apply(lambda x: grades.index(x) + 1 if x in grades else np.nan)
+    df['grade'] = df['grade'].apply(lambda x: grades.index(x) + 1 if x in grades else 0)
     df['grade'] = pd.to_numeric(df['grade'])
 
     # Categorize violation action by open or closed
@@ -204,6 +228,10 @@ def fetch_restaurant_inspection_data(include_violation_code=False):
     # Make violation ratio
     g['violation_ratio'] = g['violation_count'] / g['total_inspections']
 
+    # Finally, add the closures found in the new set (if merged_set was specified)
+    if merged_set:
+        g['is_closed'] = np.where(g['camis'].isin(closed), 1, g['is_closed'])
+
     return g.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=False)
 
 
@@ -221,9 +249,9 @@ def fetch_legally_operating_businesses():
     df = pd.read_csv(NYC_OPEN_DATA_DIR + 'Legally_Operating_Businesses.csv')
 
     # Initial clean
-    df = _strip_strings(df)
-    df = _camel_case_cols(df)
-    df = _remove_punctuation(df)
+    df = strip_strings(df)
+    df = camel_case_cols(df)
+    df = remove_punctuation(df)
 
     return df
 
@@ -232,9 +260,9 @@ def fetch_alternative_agi_returns(as_percents=True):
     df = pd.read_csv(IRS_DATA_DIR + "AGI-Returns.csv")
 
     # Initial clean
-    df = _strip_strings(df)
-    df = _camel_case_cols(df)
-    df = _remove_punctuation(df)
+    df = strip_strings(df)
+    df = camel_case_cols(df)
+    df = remove_punctuation(df)
 
     # Filter out non-NYC zip codes for faster processing
     df = df.loc[df['zip'] < 11500]
@@ -256,7 +284,7 @@ def fetch_alternative_agi_returns(as_percents=True):
 
     # Make each row a zip
     df = df.groupby('zip', as_index=False).sum()
-    df = _camel_case_cols(df)
+    df = camel_case_cols(df)
 
     # Make each column into a percent representation of
     # the whole.
@@ -273,9 +301,9 @@ def fetch_alternative_demographic_stats_data():
     df = pd.read_csv(NYC_OPEN_DATA_DIR + "Demographic_Statistics_By_Zip_Code.csv")
 
     # Initial clean
-    df = _strip_strings(df)
-    df = _camel_case_cols(df)
-    df = _remove_punctuation(df)
+    df = strip_strings(df)
+    df = camel_case_cols(df)
+    df = remove_punctuation(df)
 
     df = df.rename(columns={'jurisdiction_name': 'zip'})
 
@@ -319,8 +347,8 @@ def fetch_alternative_financial_data():
     df = df.fillna(0)
 
     # Initial clean
-    df = _strip_strings(df)
-    df = _camel_case_cols(df)
-    df = _remove_punctuation(df)
+    df = strip_strings(df)
+    df = camel_case_cols(df)
+    df = remove_punctuation(df)
 
     return df

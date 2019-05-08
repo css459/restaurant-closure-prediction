@@ -5,11 +5,14 @@
 # main.py
 #
 
-from src.fetch import fetch_alternative_agi_returns
 
-# df = fetch_restaurant_inspection_data()
-# df = fetch_restaurant_violation_lookup_table()
-# df = fetch_inspection_data()
-# df2 = fetch_legally_operating_businesses()
+# ====================================================================
+# import src.preprocessing.fetch as fetch
+# Merged set closure rate: 3.2%
+# Merging netted about 750 new closures
+# df = fetch.fetch_restaurant_inspection_data(merged_set=False)
+# ====================================================================
 
-df = fetch_alternative_agi_returns()
+from src.models.visualization import pca_clusters
+
+pca_clusters()
