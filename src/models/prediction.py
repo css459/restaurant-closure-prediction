@@ -11,14 +11,16 @@
 
 
 import pandas as pd
-from sklearn.ensemble import GradientBoostingRegressor
+import sklearn.metrics as metric
+from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
+from sklearn.feature_selection import RFECV
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, explained_variance_score, r2_score
-from sklearn.neural_network import MLPRegressor
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPRegressor, MLPClassifier
 
 from src.preprocessing.fetch import fetch_restaurant_inspection_data
 from src.preprocessing.merge import master
-from src.preprocessing.transform import split_train_test
+from src.preprocessing.transform import split_train_test, min_max_scale_values
 
 
 class Model:
@@ -30,25 +32,56 @@ class Model:
         # The estimator that was used
         self.estimator = None
 
+        # Name of the prediction column
+        self.y_col = None
+
     def prepare(self):
         raise NotImplementedError
 
     def _fit(self):
-        x_train, x_test, y_train, y_test = split_train_test(self.df.fillna(0))
+        x_train, x_test, y_train, y_test = split_train_test(self.df.fillna(0), y=self.y_col)
         print("Training Size:", len(x_train))
         print("Test Size    :", len(x_test))
 
         self.estimator.fit(x_train, y_train)
         self.validate(y_test, x_test)
 
-    def select_features(self, estimator):
-        pass
+    def select_features(self, print_output=True, apply_and_refit=True):
+        x, y, _, _ = split_train_test(self.df.fillna(0), y=self.y_col, split_size=0.0)
+
+        selector = RFECV(self.estimator, n_jobs=-1)
+        selector.fit(x, y)
+
+        if print_output:
+            print("Best Features for Current Estimator:")
+
+            ranks = sorted(zip(selector.ranking_, self.df.columns))
+            for r in ranks:
+                print(r)
+
+        if apply_and_refit:
+
+            # Make the selected set (those ranked as 1)
+            selected_set = []
+            for i in range(len(selector.ranking_)):
+                if selector.ranking_[i] == 1:
+                    selected_set.append(self.df.columns.values[i])
+
+            # Apply to df
+            self.df = self.df[selected_set]
+
+            # Re-fit
+            self._fit()
+
+            # Validate
+            _, x_test, _, y_test = split_train_test(self.df.fillna(0), y=self.y_col)
+            self.validate(y_test, x_test)
 
     def validate(self, y_test, x_test):
         raise NotImplementedError
 
 
-class ClosureClassifier:
+class ClosureClassifier(Model):
     """
     Performs classification of closed/not-closed
     on the Restaurant Inspections dataset. This can
@@ -57,23 +90,72 @@ class ClosureClassifier:
     """
 
     def __init__(self):
+        super().__init__()
+
         # The restaurant closure dataset
         self.df = fetch_restaurant_inspection_data()
 
+        self.y_col = "is_closed"
+
     def prepare(self):
-        pass
+        df = fetch_restaurant_inspection_data().fillna(0)
+
+        # Temporarily remove the Y column
+        y = df[self.y_col]
+        df = df.drop(self.y_col, 1)
+
+        # Drop other unneeded columns
+        drop_list = ['camis', 'dba', 'boro', 'building', 'street', 'zip', 'phone',
+                     'inspection_year', 'inspection_month', 'inspection_day',
+                     'violation_ratio']
+
+        df = df.drop(drop_list, 1)
+
+        # Pivot cuisine
+        cuisines = pd.get_dummies(df['cuisine_description'], prefix='cuisine')
+        df = df.join(cuisines).drop('cuisine_description', 1)
+
+        df = min_max_scale_values(df, None)
+
+        # Place back Y col
+        # self.df = self.df.assign(self.y_col=y)
+        df[self.y_col] = y.copy()
+
+        self.df = df
 
     def fit_gradient_boosting(self):
-        pass
+        print("=== Gradient Boosting ========================")
+
+        self.estimator = GradientBoostingClassifier(n_estimators=200,
+                                                    learning_rate=0.1)
+        self._fit()
+
+        features_importance = sorted(zip(self.estimator.feature_importances_,
+                                         self.df.columns),
+                                     reverse=True)
+        for f in features_importance[:10]:
+            print(f)
+        print("==============================================")
 
     def fit_knn(self):
-        pass
+        print("=== kNN ======================================")
+
+        self.estimator = KNeighborsClassifier(n_neighbors=30)
+        self._fit()
+        print("==============================================")
 
     def fit_neural_network(self):
-        pass
+        print("=== Neural Network ===========================")
+        self.estimator = MLPClassifier(hidden_layer_sizes=(15, 5),
+                                       alpha=0.001)
+        self._fit()
+        print("==============================================")
 
-    def validate(self):
-        pass
+    def validate(self, y_test, x_test):
+        print("Results:")
+        print(metric.confusion_matrix(y_test, self.estimator.predict(x_test)))
+        print("F1         :", metric.f1_score(y_test, self.estimator.predict(x_test)))
+        print("Cohen Kappa:", metric.cohen_kappa_score(y_test, self.estimator.predict(x_test)))
 
 
 class ClosureRegressor(Model):
@@ -87,19 +169,14 @@ class ClosureRegressor(Model):
     """
 
     def __init__(self):
-        # The master dataset
         super().__init__()
 
+        # The master dataset
         self.df = master()
 
-        # # The estimator that was used
-        # # (either GBM or Linear Regression)
-        # self.estimator = None
+        self.y_col = "total_closures"
 
     def prepare(self):
-        # Name of the column to predict upon
-        y_col = "total_closures"
-
         df = self.df.loc[pd.to_numeric(self.df['inspection_year']) != 1900]
 
         # Drop identifying columns
@@ -111,33 +188,6 @@ class ClosureRegressor(Model):
         print(drop_list)
 
         self.df = df.drop(drop_list, 1)
-
-        # Pivot cuisine
-        # cuisines = pd.get_dummies(df['cuisine_description'], prefix='cuisine')
-        # df = df.join(cuisines).drop('cuisine_description', 1)
-
-        # df = min_max_scale_values(df, None)
-
-        # is_closed_labels = np.where(df[y_col], 1, 0)
-
-        #
-        # Downsample majority class
-        #
-
-        # open_downsample = df.loc[df[y_col] == 0].sample(sum(is_closed_labels) * 3,
-        #                                                       random_state=42)
-        #
-        # s = pd.concat([open_downsample, df.loc[df[y_col] == 1]])
-
-        #
-        # Re-upsample with replacement on Sub-sample set
-        #
-
-        # df_resample = resample(s, n_samples=2000, replace=False, random_state=42)
-
-        # df_resample = s
-        # is_closed_labels_resample = df_resample[y_col]
-        # df_resample = df_resample.drop(y_col, 1)
 
     def fit_gradient_boosting(self):
         print("=== Gradient Boosting ========================")
@@ -151,7 +201,6 @@ class ClosureRegressor(Model):
                                      reverse=True)
         for f in features_importance[:10]:
             print(f)
-
         print("==============================================")
 
     def fit_lin_reg(self):
@@ -167,11 +216,8 @@ class ClosureRegressor(Model):
         self._fit()
         print("==============================================")
 
-    def select_features(self, estimator):
-        pass
-
     def validate(self, y_test, x_test):
         print("Results:")
-        print("Exp Var:", explained_variance_score(y_test, self.estimator.predict(x_test)))
-        print("MAE    :", mean_absolute_error(y_test, self.estimator.predict(x_test)))
-        print("R2     :", r2_score(y_test, self.estimator.predict(x_test)))
+        print("Exp Var:", metric.explained_variance_score(y_test, self.estimator.predict(x_test)))
+        print("MAE    :", metric.mean_absolute_error(y_test, self.estimator.predict(x_test)))
+        print("R2     :", metric.r2_score(y_test, self.estimator.predict(x_test)))

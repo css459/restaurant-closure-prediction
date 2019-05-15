@@ -26,21 +26,27 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 from src.models.prediction import ClosureRegressor
 
 print("*** Closure Regressor ******************************")
-print("** Using Master Data Set")
+print("*** Using Master Data Set")
 print("****************************************************")
 
 c = ClosureRegressor()
 c.prepare()
 c.fit_gradient_boosting()
+c.select_features()
 c.fit_lin_reg()
 c.fit_neural_network()
 
 print("****************************************************")
 
-print()
-
-print("*** Closure Classifier *****************************")
-print("*** Using Restaurant Inspection Data Set ")
-print("****************************************************")
-
-c = Clos
+# print()
+#
+# print("*** Closure Classifier *****************************")
+# print("*** Using Restaurant Inspection Data Set ")
+# print("****************************************************")
+#
+# c = ClosureClassifier()
+# c.prepare()
+# c.fit_gradient_boosting()
+# c.select_features()
+# c.fit_knn()
+# c.fit_neural_network()

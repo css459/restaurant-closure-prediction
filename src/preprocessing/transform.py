@@ -17,7 +17,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 # Split
 #
 
-def split_train_test(df, y="total_closures", split_size=0.2):
+def split_train_test(df, y, split_size=0.2):
     """
     Performs preprocessing on the master dataset
     and splits it into training and test sets, treating
@@ -28,6 +28,9 @@ def split_train_test(df, y="total_closures", split_size=0.2):
     :param split_size:  Percent of data to use for testing
     :return:            X/Y, Train/Test Sets
     """
+    if split_size <= 0:
+        return df.drop(y, 1), df[y], None, None
+
     y_set = df[y]
     x_set = df.drop(y, 1)
 
