@@ -9,6 +9,7 @@
 #
 
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
@@ -16,46 +17,36 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 # Split
 #
 
-def split_master_train_test(master, y="total_closures"):
+def split_train_test(df, y="total_closures", split_size=0.2):
     """
     Performs preprocessing on the master dataset
     and splits it into training and test sets, treating
     it as time series data.
 
-    :param master:  The master dataset
-    :param y:       Column to predict on
-    :return:        X/Y, Train/Test Sets
+    :param df:          The master dataset
+    :param y:           Column to predict on
+    :param split_size:  Percent of data to use for testing
+    :return:            X/Y, Train/Test Sets
     """
-    pass
+    y_set = df[y]
+    x_set = df.drop(y, 1)
 
-
-def split_restaurant_train_test(restaurant_inspections, y="is_closed"):
-    """
-    Performs preprocessing on the Restaurant Inspections
-    dataset and splits it into training and testing sets,
-    treating each row as a unique restaurant.
-
-    :param restaurant_inspections:  The Restaurant Inspections dataset
-    :param y:       Column to predict on
-    :return:                        X/Y. Train/Test Sets
-    """
-    pass
-
+    return train_test_split(x_set, y_set, train_size=1 - split_size, random_state=42)
 
 #
 # Resampling
 #
 
-def selective_master_downsample(master):
-    """
-    Selectively downsample sparse data
-    in master dataset
-
-    :param master:  The master dataset
-    :return:        `DataFrame`
-    """
-
-    return master.dropna()
+# def selective_master_downsample(master):
+#     """
+#     Selectively downsample sparse data
+#     in master dataset
+#
+#     :param master:  The master dataset
+#     :return:        `DataFrame`
+#     """
+#
+#     return master.dropna()
 
 
 #

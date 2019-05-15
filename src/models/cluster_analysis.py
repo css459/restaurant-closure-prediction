@@ -14,15 +14,17 @@ from src.preprocessing.fetch import fetch_restaurant_inspection_data
 from src.preprocessing.transform import min_max_scale_values
 
 
-def pca_on_master_file(n=3):
-    """
-    Performs a PCA decomposition on the
-    master dataset (as defined in merge.py)
-
-    :param n: The number of dimensions to keep
-    :return:  `Numpy Matrix, Labels Array`
-    """
-    pass
+# NOT IMPLEMENTED: Not practical since this information
+# is grouped by DATE and zip code.
+# def pca_on_master_file(n=3):
+#     """
+#     Performs a PCA decomposition on the
+#     master dataset (as defined in merge.py)
+#
+#     :param n: The number of dimensions to keep
+#     :return:  `Numpy Matrix, Labels Array`
+#     """
+#     pass
 
 
 def pca_on_restaurant_inspections_file(n=3, y='is_closed'):
@@ -37,6 +39,7 @@ def pca_on_restaurant_inspections_file(n=3, y='is_closed'):
     """
     print("[ INF ] Beginning Restaurant Violation PCA")
     print("[ INF ] Fetching...")
+
     df = fetch_restaurant_inspection_data().dropna()
     colors = df[y]
 
@@ -44,7 +47,8 @@ def pca_on_restaurant_inspections_file(n=3, y='is_closed'):
 
     # Drop other unneeded columns
     drop_list = ['camis', 'dba', 'boro', 'building', 'street', 'zip', 'phone',
-                 'inspection_year', 'inspection_month', 'inspection_day', 'violation_ratio', 'cuisine_description']
+                 'inspection_year', 'inspection_month', 'inspection_day',
+                 'violation_ratio', 'cuisine_description']
 
     df = df.drop(drop_list, 1)
 
