@@ -24,6 +24,7 @@ from src.preprocessing.transform import split_train_test, min_max_scale_values
 
 
 class Model:
+    """Abstract Class for the below Models"""
 
     def __init__(self):
         # The data set used
@@ -73,10 +74,6 @@ class Model:
             # Re-fit
             self._fit()
 
-            # Validate
-            _, x_test, _, y_test = split_train_test(self.df.fillna(0), y=self.y_col)
-            self.validate(y_test, x_test)
-
     def validate(self, y_test, x_test):
         raise NotImplementedError
 
@@ -105,7 +102,7 @@ class ClosureClassifier(Model):
         df = df.drop(self.y_col, 1)
 
         # Drop other unneeded columns
-        drop_list = ['camis', 'dba', 'boro', 'building', 'street', 'zip', 'phone',
+        drop_list = ['camis', 'dba', 'boro', 'building', 'street', 'phone',
                      'inspection_year', 'inspection_month', 'inspection_day',
                      'violation_ratio']
 
@@ -118,16 +115,24 @@ class ClosureClassifier(Model):
         df = min_max_scale_values(df, None)
 
         # Place back Y col
-        # self.df = self.df.assign(self.y_col=y)
         df[self.y_col] = y.copy()
+
+        #
+        # Downsample majority class
+        #
+
+        open_downsample = df.loc[df[self.y_col] == 0].sample(sum(df[self.y_col]) * 3,
+                                                             random_state=42)
+
+        df = pd.concat([open_downsample, df.loc[df[self.y_col] == 1]])
 
         self.df = df
 
     def fit_gradient_boosting(self):
         print("=== Gradient Boosting ========================")
 
-        self.estimator = GradientBoostingClassifier(n_estimators=200,
-                                                    learning_rate=0.1)
+        self.estimator = GradientBoostingClassifier(n_estimators=300,
+                                                    learning_rate=0.3)
         self._fit()
 
         features_importance = sorted(zip(self.estimator.feature_importances_,
@@ -146,8 +151,11 @@ class ClosureClassifier(Model):
 
     def fit_neural_network(self):
         print("=== Neural Network ===========================")
-        self.estimator = MLPClassifier(hidden_layer_sizes=(15, 5),
-                                       alpha=0.001)
+        self.estimator = MLPClassifier(hidden_layer_sizes=(20, 7, 2),
+                                       alpha=0.00005,
+                                       learning_rate_init=0.001,
+                                       max_iter=500,
+                                       random_state=11)
         self._fit()
         print("==============================================")
 
@@ -180,7 +188,7 @@ class ClosureRegressor(Model):
         df = self.df.loc[pd.to_numeric(self.df['inspection_year']) != 1900]
 
         # Drop identifying columns
-        drop_list = ['inspection_year', 'inspection_month', 'zip', 'year', 'month']
+        drop_list = ['inspection_year', 'inspection_month', 'year', 'month']
 
         # Remove the "reason for closure" columns
         drop_list += [c for c in df.columns.values if "reason_" in c]
@@ -192,8 +200,8 @@ class ClosureRegressor(Model):
     def fit_gradient_boosting(self):
         print("=== Gradient Boosting ========================")
 
-        self.estimator = GradientBoostingRegressor(n_estimators=200,
-                                                   learning_rate=0.1)
+        self.estimator = GradientBoostingRegressor(n_estimators=300,
+                                                   learning_rate=0.13)
         self._fit()
 
         features_importance = sorted(zip(self.estimator.feature_importances_,

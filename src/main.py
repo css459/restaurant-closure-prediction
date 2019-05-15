@@ -5,10 +5,14 @@
 # main.py
 #
 
-# There are internal structures to SKLearn and Pandas
-# which throw a FutureWarning -- These are out of our control
+
 import warnings
 
+from src.models.prediction import ClosureRegressor, ClosureClassifier
+from src.models.visualization import pca_clusters
+
+# There are internal structures to SKLearn and Pandas
+# which throw a FutureWarning -- These are out of our control
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # === Restaurant Inspection Viewing ==================================
@@ -19,12 +23,10 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 # ====================================================================
 
 # === Restaurant Cluster Viewing =====================================
-# from src.models.visualization import pca_clusters
-# pca_clusters()
+pca_clusters()
 # ====================================================================
 
-from src.models.prediction import ClosureRegressor
-
+# === Closure Prediction =============================================
 print("*** Closure Regressor ******************************")
 print("*** Using Master Data Set")
 print("****************************************************")
@@ -38,15 +40,20 @@ c.fit_neural_network()
 
 print("****************************************************")
 
-# print()
-#
-# print("*** Closure Classifier *****************************")
-# print("*** Using Restaurant Inspection Data Set ")
-# print("****************************************************")
-#
-# c = ClosureClassifier()
-# c.prepare()
-# c.fit_gradient_boosting()
+print()
+
+print("*** Closure Classifier *****************************")
+print("*** Using Restaurant Inspection Data Set ")
+print("****************************************************")
+
+c = ClosureClassifier()
+c.prepare()
+c.fit_gradient_boosting()
+
+# This fails on the re-fit, if you run it, you'll
+# still get the feature list
 # c.select_features()
-# c.fit_knn()
-# c.fit_neural_network()
+
+c.fit_knn()
+c.fit_neural_network()
+# ====================================================================

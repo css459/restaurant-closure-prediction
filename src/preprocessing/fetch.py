@@ -116,6 +116,10 @@ def fetch_restaurant_inspection_data(include_violation_code=False, new_set=False
     :return:                        `DataFrame`
     """
 
+    if not include_violation_code and not new_set and merged_set:
+        if os.path.isfile("data/rid.csv"):
+            return pd.read_csv("data/rid.csv")
+
     if merged_set and new_set:
         print("[ ERR ] Invalid settings, merged_set and new_set cannot both be True")
         return None
@@ -232,7 +236,12 @@ def fetch_restaurant_inspection_data(include_violation_code=False, new_set=False
     if merged_set:
         g['is_closed'] = np.where(g['camis'].isin(closed), 1, g['is_closed'])
 
-    return g.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=False)
+    final = g.sort_values(by=['inspection_year', 'inspection_month', 'inspection_day'], ascending=False)
+
+    if not include_violation_code and not new_set and merged_set:
+        final.to_csv("data/rid.csv", index=False)
+
+    return final
 
 
 def fetch_restaurant_violation_lookup_table(refresh=False):

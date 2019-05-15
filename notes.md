@@ -95,5 +95,3 @@ I'm deciding to not use this data source.
 * I have waited long enough now that I can see a one-month lag in restaurant closures. So I will download the
 updated version of the NYC Open Data Restaurant Inspection dataset, and join them together. If a restaurant
 occurs in both, it is open, otherwise, it has closed. This should net me some more data points.
-
-* I 
