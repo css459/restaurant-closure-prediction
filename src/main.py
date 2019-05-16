@@ -46,14 +46,14 @@ print("*** Closure Classifier *****************************")
 print("*** Using Restaurant Inspection Data Set ")
 print("****************************************************")
 
-c = ClosureClassifier()
-c.prepare()
-c.fit_gradient_boosting()
+c2 = ClosureClassifier()
+c2.prepare()
+c2.fit_gradient_boosting()
 
 # This fails on the re-fit, if you run it, you'll
-# still get the feature list
+# still get the feature list, but also an exception
 # c.select_features()
 
-c.fit_knn()
-c.fit_neural_network()
+c2.fit_knn()
+c2.fit_neural_network()
 # ====================================================================
