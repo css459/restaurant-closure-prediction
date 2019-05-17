@@ -1,0 +1,92 @@
+violation_code,violation_description,count
+02a,food not cooked to required minimum temperature,273
+02b,hot food item not held at or above 140âº f,19968
+02c,hot food item that has been cooked and refrigerated is being held for service without first being reheated to 1 65âº f or above within 2 hours,470
+02d,precooked potentially hazardous food from commercial food processing establishment that is supposed to be heated but is not heated to 140âº f within 2 hours,56
+02e,whole frozen poultry or poultry breasts other than a single portion is being cooked frozen or partially thawed,4
+02f,meat fish or molluscan shellfish served raw or undercooked without prior notification to customer,21
+02g,cold food item held above 41âº f smoked fish and reduced oxygen packaged foods above 38 âºf except during necessary preparation,22341
+02h,food not cooled by an approved method whereby the internal product temperature is reduced from 140âº f to 70âº f or less within 2 hours and from 70âº f to 41âº f or less within 4 additional hours,4583
+02i,food prepared from ingredients at ambient temperature not cooled to 41âº f or below within 4 hours,315
+02j,reduced oxygen packaged rop foods not cooled by an approved method whereby the internal food temperature is reduced to 38âº f within two hours of cooking and if necessary further cooled to a temperature of 34âº f within six hours of reaching 38âº f,3
+03a,food from unapproved or unknown source or home canned reduced oxygen packaged rop fish not frozen before processing or rop foods prepared on premises transported to another site,625
+03b,shellfish not from approved source improperly taggedlabeled tags not retained for 90 days,188
+03c,eggs found dirtycracked liquid frozen or powdered eggs not pasteurized,88
+03d,canned food product observed swollen leaking or rusted and not segregated from other consumable food items ,13
+03e,potable water supply inadequate water or ice not potable or from unapproved source  cross connection in potable water supply system observed,33
+03f,unpasteurized milk or milk product present,5
+03g,raw food not properly washed prior to serving,11
+04a,food protection certificate not held by supervisor of food operations,7132
+04b,food worker prepares food or handles utensil when ill with a disease transmissible by food or have exposed infected cut or burn on hand,20
+04c,food worker does not use proper utensil to eliminate bare hand contact with food that will not receive adequate additional heat treatment,2742
+04d,food worker does not wash hands thoroughly after using the toilet coughing sneezing smoking eating preparing raw foods or otherwise contaminating hands,182
+04e,toxic chemical improperly labeled stored or used such that food contamination may occur,294
+04f,food food preparation area food storage area area used by employees or patrons contaminated by sewage or liquid waste,181
+04g,unprotected potentially hazardous food reserved,4
+04h,raw cooked or prepared food is adulterated contaminated crosscontaminated or not discarded in accordance with haccp plan,8141
+04i,unprotected food reserved,1
+04j,appropriately scaled metal stemtype thermometer or thermocouple not provided or used to evaluate temperatures of potentially hazardous foods during cooking cooling reheating and holding,1768
+04k,evidence of rats or live rats present in facilitys food andor nonfood areas,2614
+04l,evidence of mice or live mice present in facilitys food andor nonfood areas,28421
+04m,live roaches present in facilitys food andor nonfood areas,8037
+04n,filth flies or foodrefusesewageassociated frsa flies present in facilitys food andor nonfood areas filth flies include house flies little house flies blow flies bottle flies and flesh flies foodrefusesewageassociated flies include fruit flies drain flies and phorid flies,20244
+04o,live animals other than fish in tank or service animal present in facilitys food andor nonfood areas,248
+05a,sewage disposal system improper or unapproved,142
+05b,harmful noxious gas or vapor detected co 1 3 ppm,95
+05c,food contact surface improperly constructed or located unacceptable material used,452
+05d,hand washing facility not provided in or near food preparation area and toilet room hot and cold running water at adequate pressure to enable cleanliness of employees not provided at facility soap and an acceptable handdrying device not provided,3450
+05e,toilet facility not provided for employees or for patrons when required,186
+05f,insufficient or no refrigerated or hot holding equipment to keep potentially hazardous foods at required temperatures,694
+05h,no facilities available to wash rinse and sanitize utensils andor equipment,1295
+06a,personal cleanliness inadequate outer garment soiled with possible contaminant  effective hair restraint not worn in an area where food is prepared,6394
+06b,tobacco use eating or drinking from open container in food preparation food storage or dishwashing area observed,2671
+06c,food not protected from potential source of contamination during storage preparation transportation display or service,25238
+06d,food contact surface not properly washed rinsed and sanitized after each use and following any activity when contamination may have occurred,26134
+06e,sanitized equipment or utensil including inuse food dispensing utensil improperly used or stored,7690
+06f,wiping cloths soiled or not stored in sanitizing solution,7174
+06g,haccp plan not approved or approved haccp plan not maintained on premises,139
+06h,records and logs not maintained to demonstrate that haccp plan has been properly implemented,10
+06i,food not labeled in accordance with haccp plan,8
+07a,duties of an officer of the department interfered with or obstructed,42
+08a,facility not vermin proof harborage or conditions conducive to attracting vermin to the premises andor allowing vermin to exist,41559
+08b,covered garbage receptacle not provided or inadequate except that garbage receptacle may be uncovered during active use garbage storage area not properly constructed or maintained grinder or compactor dirty,582
+08c,pesticide use not in accordance with label or applicable laws prohibited chemical usedstored open bait station used,5724
+09a,canned food product observed dented and not segregated from other consumable food items,1279
+09b,thawing procedures improper,4035
+09c,food contact surface not properly maintained,6022
+10a,toilet facility not maintained and provided with toilet paper waste receptacle and selfclosing door,1024
+10b,plumbing not properly installed or maintained antisiphonage or backflow prevention device not provided where required equipment or floor not properly drained sewage disposal system in disrepair or not functioning properly,22728
+10c,lighting inadequate permanent lighting not provided in food preparation areas ware washing areas and storage rooms,395
+10d,mechanical or natural ventilation system not provided improperly installed in disrepair andor fails to prevent excessive buildup of grease heat steam condensation vapors odors smoke and fumes,1456
+10e,accurate thermometer not provided in refrigerated or hot holding equipment,2440
+10f,nonfood contact surface improperly constructed unacceptable material used nonfood contact surface or equipment improperly maintained andor not properly sealed raised spaced or movable to allow accessibility for cleaning on all sides above and underneath the unit,54157
+10g,food service operation occurring in room used as living or sleeping quarters,60
+10h,proper sanitization not provided for utensil ware washing operation,6297
+10i,single service item reused improperly stored dispensed not used when required,3849
+10j,wash hands sign not posted at hand wash facility,1984
+15i,no smoking andor smoking permitted sign not conspicuously posted health warning not present on smoking permitted,397
+15j,ashtray present in smokefree area,26
+15k,operator failed to make good faith effort to inform smokers of the smokefree act prohibition of smoking,26
+15l,smoke free workplace smoking policy inadequate not posted not provided to employees,1659
+15s,flavored tobacco products sold or offered for sale,37
+15t,original label for tobacco products sold or offered for sale,14
+16a,a food containing artificial trans fat with 05 grams or more of trans fat per serving is being stored distributed held for service used in preparation of a menu item or served,191
+16b,the original nutritional fact labels andor ingredient label for a cooking oil shortening or margarine or food item sold in bulk or acceptable manufacturers documentation not maintained on site,1887
+16c,caloric content not posted on menus menu boards or food tags in a food service establishment that is 1 of 15 or more outlets operating the same type of business nationally under common ownership or control or as a franchise or doing business under the same name for each menu item that is served in portions the size and content of which are standardized,457
+16d,posted caloric content on the menus menu boards food tags or stanchions adjacent to menu boards for drivethrough windows deficient in that the size andor font for posted calories is not as prominent as the name of the menu item or its price,454
+16e,caloric content range minimum to maximum not posted on menus and or menu boards for each flavor variety and size of each menu item that is offered for sale in different flavors varieties and sizes,435
+16f,specific caloric content or range thereof not posted on menus menu boards or food tags for each menu item offered as a combination meal with multiple options that are listed as single items,1
+18b,document issued by the board of health commissioner or department unlawfully reproduced or altered,10
+18c,notice of the department of board of health mutilated obstructed or removed,37
+18d,failure to comply with an order of the board of health commissioner or department,94
+18f,permit not conspicuously displayed,119
+18g,manufacture of frozen dessert not authorized on food service establishment permit,40
+20a,food allergy information poster not conspicuously posted where food is being prepared or processed by food workers,496
+20b,food allergy information poster not posted in language understood by all food workers,2
+20d,choking first aid poster not posted alcohol and pregnancy warning sign not posted resuscitation equipment exhaled air resuscitation masks adult  pediatric latex gloves sign not posted inspection report sign not posted,1199
+20e,letter grade or grade pending card not conspicuously posted and visible to passersby,151
+20f,current letter grade card not posted,2384
+22a,nuisance created or allowed to exist facility not free from unsafe hazardous offensive or annoying conditions,788
+22b,toilet facility used by women does not have at least one covered garbage receptacle,54
+22c,bulb not shielded or shatterproof in areas where there is extreme heat temperature changes or where accidental contact may occur,1749
+22e,rop processing equipment not approved by dohmh,120

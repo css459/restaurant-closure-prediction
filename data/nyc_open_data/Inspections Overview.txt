@@ -1,0 +1,8 @@
+Total Data points: 2806
+
+Closed or failed inspection: 295 (295/2806 = 0.10513186)
+
+Definite Closure: 145 (145/295 = 0.49, 145/2806 = 0.05)
+
+
+
