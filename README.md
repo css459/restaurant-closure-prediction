@@ -1,5 +1,5 @@
-# bds-final-project
-Prediction Engine for Restaurant Closures in NYC
+# Restaurant Closure Prediction Engine (2019)
+Final Project for Big Data Science, Spring 2019
 
 Cole Smith
 
@@ -73,7 +73,3 @@ aggregated to a monthly time-scale.
 
 The **total closures** are therefore the sum between soft and hard closures 
 for a given month and zip code.
-
-## Support
-
-Contact Cole Smith ASAP at [css@nyu.ed](mailto:css@nyu.edu) or 727-417-7159.
